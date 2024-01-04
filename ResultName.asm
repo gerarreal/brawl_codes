@@ -3,6 +3,7 @@ Expanded Result Screen Names [GeraRReal]
 # Minor update from the CBM release that just changes how jumps is done
 # Also added set related functions
 ########################################
+# <ID> corresponds to the Cosmetic ID in BrawlEx's folder
 # Set-specific Result Name, only difference is that it doesn't check for modulo 10.
 # You might wanna use this if you have a set of costumes for 1X or if your build skips the modulo 10 check with costumes and ect files.
 .macro setCostumeResultsName_set_nm(<ID>,<set>,<A>,<B>,<C>,<D>,<E>,<F>,<G>,<H>)
