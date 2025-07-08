@@ -250,15 +250,6 @@ HOOK @ $8069A304
   %Uhh()
 }
 
-# Skip Poke3 check if Random
-HOOK @ $80694A2C
-{
-  cmpwi r29, 0x29
-  bne %END%
-  %lwd(r11, Write)
-}
-op beq 0x4C @ $80694A30
-
 # exchangeCharKingDetail
 CODE @ $806948E8
 {
@@ -266,11 +257,12 @@ CODE @ $806948E8
   nop 
 }
 op cmpwi r4, 0x29 @ $806948D4
-HOOK @ $806948D8
+CODE @ $806948D8
 {
+  bne 0x1C
   %lwd(r5, Write)
+  b 0x1C
 }
-op beq 0x24 @ $806948DC
 op nop @ $80694904
 op lbzx r4, r5, r0 @ $80694908
 
