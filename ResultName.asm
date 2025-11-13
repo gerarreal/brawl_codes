@@ -1,6 +1,7 @@
-###############################################################
-Expanded Result Screen Names + Pokemon Stadium Name [GeraRReal]
-###############################################################
+#############################################################################
+Expanded Result Screen Names + Pokemon Stadium Name v1.1 [GeraRReal, Squidgy]
+# Fix issues with P+Ex 1.6 credits module
+#############################################################################
 # <ID> corresponds to the Cosmetic ID in BrawlEx's folder
 
 # Range specific Result Name
@@ -9,9 +10,9 @@ Expanded Result Screen Names + Pokemon Stadium Name [GeraRReal]
 {
     cmpwi r5, <ID>		# Compare character
     bne 0x38			# If it doesn't match, skip to the end
-	cmpwi r14, <min>	# Compare with min
+	cmpwi r6, <min>		# Compare with min
 	blt 0x30			# If less, skip the check
-	cmpwi r14, <max>	# Compare with max
+	cmpwi r6, <max>		# Compare with max
 	bge 0x28			# If greater and equal, skip the check
 	bl bl_trick			# Else, bl trick to the end and get the name
 	word <A>
@@ -29,7 +30,7 @@ Expanded Result Screen Names + Pokemon Stadium Name [GeraRReal]
 {
     cmpwi r5, <ID>		# Compare character
     bne 0x30			# If it doesn't match, skip to the end
-    cmpwi r14, <Costume># Check if costume ID
+    cmpwi r6, <Costume>	# Check if costume ID
     bne 0x28			# If not equal, skip the check
 	bl bl_trick			# Else, bl trick to the end and get the name
 	word <A>
@@ -40,33 +41,6 @@ Expanded Result Screen Names + Pokemon Stadium Name [GeraRReal]
 	word <F>
 	word <G>
 	word <H>
-}
-
-HOOK @ $800AFA98
-{
-    lbz r14, 0x26(r31)
-	stw r31, 0xC(r1)
-}
-
-HOOK @ $800AFA44
-{
-	lwz r3, -0x4340(r13)
-	lwz r14, 0x0018(r3)
-	cmpwi r24, 3
-	bgt leader
-	cmpwi r24, 0
-	blt leader
-	b normal
-normal:
-	mulli r15, r24, 0x2AC
-	b b_end
-leader:
-	mulli r15, r29, 0x2AC
-b_end:
-	add r14, r14, r15
-	mr r5, r31
-	lbz r14, 0x26(r14)
-	b %END%
 }
 
 .macro myNames()
@@ -80,9 +54,9 @@ b_end:
 # Results Screen
 HOOK @ $800E7C54
 {
+	lbz r6, 0x26 (r31)	# load costume ID into r6
     %myNames()
     mr r5, r3           # Original Function
-	li r14, 0			# Return r14 to it's original value
 	b %END%
 bl_trick:
 	mflr r5				# Get new character name
@@ -92,9 +66,12 @@ bl_trick:
 # Pokemon Stadium
 HOOK @ $800AFA74
 {
+	lwz r6, -0x4340(r13)	# \ load costume ID into r6
+	lwz r6, 0x0018(r6)		# |
+	lbz r6, 0x26 (r6)		# /
+	mr r5, r31				# load fighter ID into r5
     %myNames()
 	lwzx r3, r3, r0 	# Original function
-	li r14, 0 			# Return r14 to it's original value
 	b %END%
 bl_trick:
 	mflr r3				# Get new character name
