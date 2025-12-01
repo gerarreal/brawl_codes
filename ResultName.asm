@@ -64,16 +64,42 @@ bl_trick:
 }
 
 # Pokemon Stadium
-HOOK @ $800AFA74
+HOOK @ $80986278
 {
-	lwz r6, -0x4340(r13)	# \ load costume ID into r6
-	lwz r6, 0x0018(r6)		# |
-	lbz r6, 0x26 (r6)		# /
-	mr r5, r31				# load fighter ID into r5
+	# reimplement the entire exchangeMuStockchkind2MuCharName function
+	mr r4, r3
+	lwz r3, -0x4340 (r13)
+	lis r12, 0x8004			# \ setNameRumbleSwitch
+	ori r12, r12, 0xD9E8	# |
+	mtctr r12				# |
+  	bctrl 					# /
+	cmpwi r3, 0
+	beq- getName
+	lis r3, 0x817D
+	rlwinm r0, r4, 2, 0, 29
+	addi r3, r3, 0x62E0
+	lwzx r3, r3, r0
+	b defaultName
+getName:
+	lis r3, 0x817D
+	rlwinm r0, r4, 2, 0, 29
+	addi r3, r3, 0x62E0
+	# new code
+	lis r6, 0x805a			# \ get GameGlobal
+	ori r6, r6, 0x00e0		# |
+	lwz r6, 0x0 (r6)		# |
+	lwz r6, 0x0018(r6)		# | GameGlobal->gmResultInfo
+	addi r6, r6, 0x24		# | gmResultInfo->gmPlayerResultInfo
+	mulli r7, r24, 0x2AC	# | r24 is the port number, each element of gmPlayerResultInfo is 0x2AC in size, so multiply these to get correct player data
+	add r6, r6, r7			# | add to r6 to get correct offset
+	lbz r6, 0x2 (r6)		# / load costume ID into r6
+	mr r5, r4				# load fighter ID into r5
     %myNames()
 	lwzx r3, r3, r0 	# Original function
-	b %END%
+	b defaultName
 bl_trick:
 	mflr r3				# Get new character name
-	b %END%				# End
+	# end new code
+defaultName:
+	lwz r0, 0x14 (r1)
 }
